@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#121215" />
+  <title>Study Planner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="top-header">
+      <h1 id="pageTitle">Мои уроки</h1>
+      <button type="button" id="openSettingsBtn" class="icon-btn" aria-label="Settings">⚙</button>
+    </header>
+
+    <main id="mainContent"></main>
+
+    <nav class="bottom-nav" id="bottomNav"></nav>
+  </div>
+
+  <!-- Модальное окно: Добавить / Редактировать ДЗ -->
+  <div id="taskModal" class="modal-backdrop hidden">
+    <form id="taskForm" class="modal-sheet" novalidate>
+      <div class="modal-header">
+        <button type="button" id="closeTaskModalBtn" class="circle-btn">←</button>
+        <h2 id="taskModalTitle">Добавить ДЗ</h2>
+        <button type="button" id="deleteTaskBtn" class="circle-btn danger hidden">✕</button>
+      </div>
+
+      <div id="subjectCard" class="field-card">
+        <label id="lblSubject" for="inputSubject">Предмет</label>
+        <input type="text" id="inputSubject" autocomplete="off" placeholder="Например: Алгебра, Химия..." />
+        <div id="subjectChips" class="chips-row"></div>
+      </div>
+
+      <div id="descCard" class="field-card">
+        <label id="lblDesc" for="inputDesc">Что задали</label>
+        <textarea id="inputDesc" rows="2" placeholder="Например: №145, 146 или параграф 12..."></textarea>
+      </div>
+
+      <div class="date-cards-row">
+        <button type="button" id="pickAssignedBtn" class="date-card">
+          <span class="date-card-label" id="lblAssigned">Когда задали</span>
+          <strong id="valAssigned">--.--.----</strong>
+        </button>
+        <button type="button" id="pickDueBtn" class="date-card active">
+          <span class="date-card-label" id="lblDue">К какому числу</span>
+          <strong id="valDue">--.--.----</strong>
+        </button>
+      </div>
+
+      <button type="submit" id="saveTaskBtn" class="primary-btn full-width">Сохранить</button>
+
+      <div class="calendar-box">
+        <div class="calendar-header">
+          <span id="lblSelectDate">Выберите дату</span>
+          <div class="calendar-nav">
+            <button type="button" id="prevMonthBtn" class="mini-btn">‹</button>
+            <span id="calMonthLabel">Ноябрь 2026</span>
+            <button type="button" id="nextMonthBtn" class="mini-btn">›</button>
+          </div>
+        </div>
+        <div id="calWeekdays" class="calendar-weekdays"></div>
+        <div id="calGrid" class="calendar-grid"></div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Модальное окно: Редактирование пары в расписании -->
+  <div id="slotModal" class="modal-backdrop hidden">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div>
+          <h2 id="slotModalTitle">Понедельник • 1 пара</h2>
+          <p id="slotModalSub" class="muted-small">Неделя 1 из 18</p>
+        </div>
+        <button type="button" id="closeSlotModalBtn" class="circle-btn">✕</button>
+      </div>
+
+      <label class="toggle-card">
+        <span id="lblMarkWindow">Отметить как «Окно» (свободная пара)</span>
+        <input type="checkbox" id="slotWindowCheck" />
+      </label>
+
+      <div id="slotSubjectBox" class="field-card">
+        <label id="lblSlotSubject" for="slotSubjectInput">Предмет</label>
+        <input type="text" id="slotSubjectInput" autocomplete="off" placeholder="Например: Алгебра, Химия..." />
+      </div>
+
+      <div class="scope-section">
+        <div id="lblApplyWeeks" class="section-label">На какие недели применить?</div>
+        <div id="weekModesGrid" class="modes-grid"></div>
+
+        <div id="rangeControls" class="range-grid hidden">
+          <div class="field-card compact">
+            <label id="lblFromWeek" for="rangeStartSelect">С недели</label>
+            <select id="rangeStartSelect"></select>
+          </div>
+          <div class="field-card compact">
+            <label id="lblToWeek" for="rangeEndSelect">По неделю</label>
+            <select id="rangeEndSelect"></select>
+          </div>
+        </div>
+
+        <div id="specificWeeksGrid" class="weeks-picker hidden"></div>
+      </div>
+
+      <div id="existingRulesBox" class="rules-section hidden">
+        <div id="lblActiveRules" class="muted-small">Правила для этой пары:</div>
+        <div id="existingRulesList" class="chips-row"></div>
+      </div>
+
+      <div class="modal-footer-row">
+        <button type="button" id="clearSlotBtn" class="secondary-btn">Очистить пару</button>
+        <button type="button" id="saveSlotBtn" class="primary-btn flex-1">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно: Настройки -->
+  <div id="settingsModal" class="modal-backdrop hidden">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 id="settingsTitle">Настройки</h2>
+        <button type="button" id="closeSettingsBtn" class="circle-btn">✕</button>
+      </div>
+
+      <div class="scope-section">
+        <div id="lblLanguage" class="muted-small">Язык интерфейса</div>
+        <div id="langButtons" class="lang-grid"></div>
+      </div>
+
+      <div class="date-cards-row">
+        <button type="button" id="exportJsonBtn" class="secondary-btn">Экспорт JSON</button>
+        <label class="secondary-btn file-label">
+          <span id="lblImportJson">Импорт JSON</span>
+          <input type="file" id="importJsonInput" accept="application/json" hidden />
+        </label>
+      </div>
+
+      <button type="button" id="resetAllBtn" class="danger-btn full-width">Сбросить все данные</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
